@@ -1,0 +1,58 @@
+[package]
+name = "rspace_plus_plus"
+version = "0.1.0"
+edition = "2021"
+
+#[workspace]
+#members = ["libs/rspace_rhotypes"]
+
+[profile.dev]
+debug = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+models = { workspace = true }
+bincode = { workspace = true }
+heed = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+dashmap = { workspace = true }
+prost = { workspace = true }
+bit-set = { workspace = true }
+monadic = { workspace = true }
+futures = { workspace = true }
+state = { workspace = true }
+itertools = { workspace = true }
+blake2 = { workspace = true }
+tokio = { workspace = true }
+rand = { workspace = true }
+blake3 = { workspace = true }
+async-trait = { workspace = true }
+bytes = { workspace = true }
+log = { workspace = true }
+rayon = { workspace = true }
+hex = { workspace = true }
+proptest = { workspace = true }
+lazy_static = { workspace = true }
+prost-types = { workspace = true }
+chrono = { workspace = true }
+once_cell = { workspace = true }
+rstest = { workspace = true }
+proptest-derive = { workspace = true }
+counter = { workspace = true }
+multiset = { workspace = true }
+
+[dependencies.uuid]
+version = "1.4.0"
+features = [
+	"v4",                # Lets you generate random UUIDs
+	"fast-rng",          # Use a faster (but still sufficiently random) RNG
+	"macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]
+
+[dev-dependencies]
+test-env-helpers = "0.2.2"
+
+[build-dependencies]
+prost-build = { workspace = true }
