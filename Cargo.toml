@@ -1,53 +1,6 @@
 [workspace]
-members  = ["rholang", "crypto", "models", "shared", "rspace++", "rspace++/libs/rspace_rhotypes"]
-resolver = "2"
 
 [workspace.dependencies]
-crypto = { path = "crypto" }
-models = { path = "models" }
-shared = { path = "shared" }
-rspace_plus_plus = { path = "rspace++" }
-tree-sitter-rholang = { path = "rholang/src/main/tree_sitter/" }
-itertools = "*"
-tokio = { version = "*", features = ["full"] }
-tree-sitter = "^0.23"
-tree-sitter-rust = "^0.23"
-tree-sitter-language = "0.1"
-cc = { version = "*", features = [] }
-hex = "*"
-prost = "0.12.4"
-zbase32 = "*"
-lazy_static = "*"
-futures = "*"
-bincode = { version = "1.3.3" }
-regex = { version = "*", features = ["unicode"] }
-rand = "0.8.5"
-serde = { version = "*", features = ["derive"] }
-uuid = { version = "*", features = ["v4"] }
-prost-build = "*"
-blake2 = "*"
-sha2 = "*"
-tiny-keccak = { version = "*", features = ["keccak"] }
-heed = "*"
-serde_json = "*"
-dashmap = "*"
-bit-set = "*"
-monadic = "*"
-state = "*"
-blake3 = "*"
-async-trait = "*"
-bytes = "*"
-log = "*"
-rayon = "*"
-proptest = "*"
-prost-types = "*"
-chrono = "*"
-once_cell = "*"
-rstest = "*"
-proptest-derive = "*"
-counter = "*"
-multiset = "*"
-
 
 [profile.dev]
 debug = true
