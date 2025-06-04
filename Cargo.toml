@@ -4,11 +4,12 @@ members = [
     "shell",
     "rholang-tree-sitter"
 ]
+resolver = "3"
 
 [workspace.dependencies]
 anyhow = "*"
 async-trait = "*"
-tokio = { version = "*", features = ["full"] }
+tokio = { version = "*", features = ["rt", "rt-multi-thread", "full"] }
 rustyline-async = "*"
 rustyline = "*"
 rstest = "*"
