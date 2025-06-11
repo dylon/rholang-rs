@@ -24,6 +24,11 @@ run:
 run-with-history:
 	cargo run -p shell --features with-file-history
 
+# Run the examples processor
+.PHONY: run-examples
+run-examples:
+	cargo run --example process_examples
+
 # Run all tests
 .PHONY: test
 test:
@@ -95,6 +100,7 @@ help:
 	@echo "  release         Build with optimizations"
 	@echo "  run             Run the shell binary"
 	@echo "  run-with-history Run the shell binary with file history feature"
+	@echo "  run-examples     Run the examples processor"
 	@echo "  test            Run all tests"
 	@echo "  test-all        Run all tests including ignored tests"
 	@echo "  test-shell      Run tests for the shell crate"
