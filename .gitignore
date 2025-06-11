@@ -182,3 +182,5 @@ Temporary Items
 
 .mcp.json
 /Cargo.lock
+/coverage/tarpaulin-report.html
+/.junie/guidelines.md
