@@ -3,7 +3,8 @@ resolver = "3"
 members = [
     "shell",
     "rholang-tree-sitter",
-    "rholang-fake"
+    "rholang-fake",
+    "rholang-parser"
 ]
 
 [workspace.dependencies]
@@ -17,7 +18,7 @@ clap = { version = "4.5.40", features = ["derive"] }
 async-std = { version = "1.13.1", features = ["attributes"] }
 bracket-parser = "0.1.0"
 cc = "1.0.83"
-tree-sitter = "0.20.10"
+tree-sitter = "0.25.6"
 tree-sitter-language = "0.1.5"
 
 [profile.dev]
