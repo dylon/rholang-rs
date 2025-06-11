@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
-use shell::{providers::RholangFakeInterpreterProvider, run_shell, Args};
+use shell::{providers::RholangParserInterpreterProvider, run_shell, Args};
 use std::time::Duration;
 use tokio::time::timeout;
 
@@ -12,7 +12,7 @@ async fn test_main_function_code_path() -> Result<()> {
     let args = Args::parse_from(["program_name"]);
 
     // Create the interpreter provider
-    let interpreter = RholangFakeInterpreterProvider::new()?;
+    let interpreter = RholangParserInterpreterProvider::new()?;
 
     // Set a very short delay for tests
     interpreter.set_delay(0)?;
@@ -43,7 +43,7 @@ async fn test_main_function_with_multiline() -> Result<()> {
     assert!(args.multiline, "Multiline mode should be enabled");
 
     // Create the interpreter provider
-    let interpreter = RholangFakeInterpreterProvider::new()?;
+    let interpreter = RholangParserInterpreterProvider::new()?;
 
     // Set a very short delay for tests
     interpreter.set_delay(0)?;

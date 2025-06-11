@@ -22,7 +22,7 @@ tokio = { workspace = true }
 rustyline-async = { workspace = true }
 clap = { workspace = true }
 bracket-parser = { workspace = true }
-rholang-fake = { path = "../rholang-fake" }
+rholang-parser = { path = "../rholang-parser" }
 
 
 [[example]]

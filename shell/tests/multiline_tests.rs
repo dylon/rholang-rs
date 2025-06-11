@@ -1,8 +1,7 @@
 use anyhow::Result;
-use rholang_fake::InterpretationResult;
 use rstest::rstest;
 
-use shell::providers::{FakeInterpreterProvider, InterpreterProvider};
+use shell::providers::{FakeInterpreterProvider, InterpretationResult, InterpreterProvider};
 
 // This file previously contained integration tests that required running the full binary.
 // Those tests were removed because they were failing and required significant maintenance.

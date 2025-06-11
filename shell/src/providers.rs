@@ -1,12 +1,121 @@
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
-use rholang_fake::{FakeRholangInterpreter, InterpretationResult, InterpreterError};
+use rholang_parser::{errors::ParseResult, RholangParser};
 use std::collections::HashMap;
+use std::fmt;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 use tokio::sync::oneshot;
 use tokio::task;
 use tokio::time::timeout;
+
+/// Represents an error that occurred during interpretation
+#[derive(Debug, Clone)]
+pub struct InterpreterError {
+    /// A human-readable error message
+    pub message: String,
+    /// The position in the source code where the error occurred (if available)
+    pub position: Option<String>,
+    /// The source code that caused the error (if available)
+    pub source: Option<String>,
+}
+
+impl InterpreterError {
+    /// Create a new parsing error
+    pub fn parsing_error(
+        message: impl Into<String>,
+        position: Option<String>,
+        source: Option<String>,
+    ) -> Self {
+        InterpreterError {
+            message: message.into(),
+            position,
+            source,
+        }
+    }
+
+    /// Create a new timeout error
+    pub fn timeout_error(message: impl Into<String>) -> Self {
+        InterpreterError {
+            message: message.into(),
+            position: None,
+            source: None,
+        }
+    }
+
+    /// Create a new cancellation error
+    pub fn cancellation_error(message: impl Into<String>) -> Self {
+        InterpreterError {
+            message: message.into(),
+            position: None,
+            source: None,
+        }
+    }
+
+    /// Create a new other error
+    pub fn other_error(message: impl Into<String>) -> Self {
+        InterpreterError {
+            message: message.into(),
+            position: None,
+            source: None,
+        }
+    }
+}
+
+impl fmt::Display for InterpreterError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.message)?;
+
+        if let Some(position) = &self.position {
+            write!(f, " at {}", position)?;
+        }
+
+        if let Some(source) = &self.source {
+            write!(f, "\nSource: {}", source)?;
+        }
+
+        Ok(())
+    }
+}
+
+/// Represents the result of an interpretation operation
+#[derive(Debug, Clone)]
+pub enum InterpretationResult {
+    /// Successful interpretation with a result value
+    Success(String),
+    /// Error during interpretation
+    Error(InterpreterError),
+}
+
+impl InterpretationResult {
+    /// Returns true if the result is a success
+    pub fn is_success(&self) -> bool {
+        matches!(self, InterpretationResult::Success(_))
+    }
+
+    /// Returns true if the result is an error
+    pub fn is_error(&self) -> bool {
+        matches!(self, InterpretationResult::Error(_))
+    }
+
+    /// Unwraps the success value, panics if the result is an error
+    pub fn unwrap(self) -> String {
+        match self {
+            InterpretationResult::Success(value) => value,
+            InterpretationResult::Error(err) => panic!("Called unwrap on an error result: {}", err),
+        }
+    }
+
+    /// Unwraps the error value, panics if the result is a success
+    pub fn unwrap_err(self) -> InterpreterError {
+        match self {
+            InterpretationResult::Success(_) => {
+                panic!("Called unwrap_err on a success result")
+            }
+            InterpretationResult::Error(err) => err,
+        }
+    }
+}
 
 /// Trait for interpreter providers
 /// This trait defines the interface for interpreters that can be used with the shell
@@ -72,10 +181,10 @@ struct ProcessInfo {
     cancel_sender: Option<oneshot::Sender<()>>,
 }
 
-/// Provider for the fake Rholang interpreter
+/// Provider for the Rholang parser
 /// This implements the InterpreterProvider trait
 #[derive(Clone)]
-pub struct RholangFakeInterpreterProvider {
+pub struct RholangParserInterpreterProvider {
     /// Map of process ID to process information
     processes: Arc<Mutex<HashMap<usize, ProcessInfo>>>,
     /// Next process ID to assign
@@ -84,10 +193,10 @@ pub struct RholangFakeInterpreterProvider {
     delay_ms: Arc<Mutex<u64>>,
 }
 
-impl RholangFakeInterpreterProvider {
-    /// Create a new instance of the Rholang fake interpreter provider
+impl RholangParserInterpreterProvider {
+    /// Create a new instance of the Rholang parser interpreter provider
     pub fn new() -> Result<Self> {
-        Ok(RholangFakeInterpreterProvider {
+        Ok(RholangParserInterpreterProvider {
             processes: Arc::new(Mutex::new(HashMap::new())),
             next_pid: Arc::new(Mutex::new(1)),
             delay_ms: Arc::new(Mutex::new(2000)), // Default delay: 2 seconds
@@ -105,41 +214,20 @@ impl RholangFakeInterpreterProvider {
     }
 }
 
-/// Implementation of the InterpreterProvider trait for the fake Rholang interpreter
+/// Implementation of the InterpreterProvider trait for the Rholang parser
 #[async_trait]
-impl InterpreterProvider for RholangFakeInterpreterProvider {
+impl InterpreterProvider for RholangParserInterpreterProvider {
     async fn interpret(&self, code: &str) -> InterpretationResult {
-        // Create a new interpreter for each call to avoid mutability issues
-        let mut interpreter = match FakeRholangInterpreter::new() {
-            Ok(interpreter) => interpreter,
+        // Create a new parser for each call to avoid mutability issues
+        let mut parser = match RholangParser::new() {
+            Ok(parser) => parser,
             Err(e) => {
                 return InterpretationResult::Error(InterpreterError::other_error(format!(
-                    "Failed to create interpreter: {}",
+                    "Failed to create parser: {}",
                     e
                 )))
             }
         };
-
-        // Set the delay for the interpreter
-        let delay = match self.delay_ms.lock() {
-            Ok(guard) => *guard,
-            Err(e) => {
-                return InterpretationResult::Error(InterpreterError::other_error(format!(
-                    "Failed to lock delay_ms: {}",
-                    e
-                )))
-            }
-        };
-        interpreter.set_delay(delay);
-
-        // Use the interpreter to parse and validate the code
-        if !interpreter.is_valid(code) {
-            return InterpretationResult::Error(InterpreterError::parsing_error(
-                "Invalid Rholang code",
-                None,
-                Some(code.to_string()),
-            ));
-        }
 
         // Clone the code for the process info and for the task
         let code_clone = code.to_string();
@@ -188,27 +276,56 @@ impl InterpreterProvider for RholangFakeInterpreterProvider {
             );
         }
 
-        // Spawn a task to run the interpreter asynchronously
+        // Get the delay for the interpreter
+        let delay = match self.delay_ms.lock() {
+            Ok(guard) => *guard,
+            Err(e) => {
+                return InterpretationResult::Error(InterpreterError::other_error(format!(
+                    "Failed to lock delay_ms: {}",
+                    e
+                )))
+            }
+        };
+
+        // Spawn a task to run the parser asynchronously
         let handle = task::spawn(async move {
             // Create a future that completes when the cancel signal is received
             let cancel_future = cancel_receiver;
 
-            // Create a future that completes when the interpreter finishes
-            let interpret_future = interpreter.interpret_async(&code_for_task);
+            // Create a future that completes when the parser finishes
+            let interpret_future = async {
+                // Add a delay to simulate processing time
+                if delay > 0 {
+                    tokio::time::sleep(Duration::from_millis(delay)).await;
+                }
 
-            // Run the interpreter with a timeout
+                // Parse the code and return the result
+                match parser.get_tree_string(&code_for_task) {
+                    ParseResult::Success(tree_string) => InterpretationResult::Success(tree_string),
+                    ParseResult::Error(err) => {
+                        let position = err.position.map(|pos| format!("{}", pos));
+                        InterpretationResult::Error(InterpreterError::parsing_error(
+                            err.message,
+                            position,
+                            err.source,
+                        ))
+                    }
+                }
+            };
+
+            // Run the parser with a timeout
             let timeout_future = timeout(Duration::from_secs(30), interpret_future);
 
-            // Wait for either the interpreter to finish, the timeout to expire, or the cancel signal to be received
+            // Wait for either the parser to finish, the timeout to expire, or the cancel signal to be received
             tokio::select! {
                 result = timeout_future => {
                     match result {
                         Ok(result) => result,
-                        Err(_) => InterpretationResult::Error(InterpreterError::timeout_error("Interpreter timed out after 30 seconds")),
+                        Err(_) => InterpretationResult::Error(InterpreterError::timeout_error("Parser timed out after 30 seconds")),
                     }
                 }
                 _ = cancel_future => {
-                    InterpretationResult::Error(InterpreterError::cancellation_error("Interpreter was cancelled"))
+                    InterpretationResult::Error(InterpreterError::cancellation_error("Parser was cancelled"))
                 }
             }
         });

@@ -1,6 +1,7 @@
 use anyhow::Result;
-use rholang_fake::InterpretationResult;
-use shell::providers::{InterpreterProvider, RholangFakeInterpreterProvider};
+use shell::providers::{
+    InterpretationResult, InterpreterProvider, RholangParserInterpreterProvider,
+};
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -35,7 +36,7 @@ fn read_file(path: &Path) -> Result<String> {
 #[tokio::test]
 async fn test_process_examples() -> Result<()> {
     // Create the interpreter
-    let interpreter = RholangFakeInterpreterProvider::new()?;
+    let interpreter = RholangParserInterpreterProvider::new()?;
     // Set delay to 0 for tests
     interpreter.set_delay(0)?;
 
@@ -57,7 +58,7 @@ async fn test_process_examples() -> Result<()> {
             }
         })
         .unwrap_or(&current_dir);
-    let examples_dir = project_root.join("rholang-fake").join("examples");
+    let examples_dir = project_root.join("rholang-parser").join("corpus");
     println!("Looking for Rholang files in: {}", examples_dir.display());
     let rholang_files = find_rholang_files(&examples_dir)?;
 
@@ -110,7 +111,7 @@ async fn test_process_examples() -> Result<()> {
 #[tokio::test]
 async fn test_process_hello_world() -> Result<()> {
     // Create the interpreter
-    let interpreter = RholangFakeInterpreterProvider::new()?;
+    let interpreter = RholangParserInterpreterProvider::new()?;
     // Set delay to 0 for tests
     interpreter.set_delay(0)?;
 
@@ -133,8 +134,8 @@ async fn test_process_hello_world() -> Result<()> {
         })
         .unwrap_or(&current_dir);
     let file_path = project_root
-        .join("rholang-fake")
-        .join("examples")
+        .join("rholang-parser")
+        .join("corpus")
         .join("tut-hello.rho");
 
     // Make sure the file exists

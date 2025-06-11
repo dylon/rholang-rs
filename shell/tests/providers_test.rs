@@ -1,7 +1,7 @@
 use anyhow::Result;
-use rholang_fake::InterpretationResult;
 use shell::providers::{
-    FakeInterpreterProvider, InterpreterProvider, RholangFakeInterpreterProvider,
+    FakeInterpreterProvider, InterpretationResult, InterpreterProvider,
+    RholangParserInterpreterProvider,
 };
 use std::time::Duration;
 use tokio::time::sleep;
@@ -38,8 +38,8 @@ async fn test_fake_interpreter_provider() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_valid_code() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_valid_code() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
     // Set delay to 0 for tests
     provider.set_delay(0)?;
 
@@ -48,7 +48,7 @@ async fn test_rholang_fake_interpreter_provider_valid_code() -> Result<()> {
     let result = provider.interpret(input).await;
     match result {
         InterpretationResult::Success(output) => {
-            assert!(output.contains("Created new name: channel"));
+            assert!(output.contains("Parse tree:"));
         }
         InterpretationResult::Error(err) => {
             panic!("Expected success, got error: {}", err);
@@ -59,8 +59,8 @@ async fn test_rholang_fake_interpreter_provider_valid_code() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_invalid_code() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_invalid_code() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
     // Set delay to 0 for tests
     provider.set_delay(0)?;
 
@@ -73,8 +73,8 @@ async fn test_rholang_fake_interpreter_provider_invalid_code() -> Result<()> {
 }
 
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_process_management() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_process_management() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
     // Set a small delay for this test to ensure processes don't complete too quickly
     provider.set_delay(100)?;
 
@@ -109,8 +109,8 @@ async fn test_rholang_fake_interpreter_provider_process_management() -> Result<(
 }
 
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_kill_all_processes() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_kill_all_processes() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
     // Set a small delay for this test to ensure processes don't complete too quickly
     provider.set_delay(100)?;
 
@@ -148,8 +148,8 @@ async fn test_rholang_fake_interpreter_provider_kill_all_processes() -> Result<(
 }
 
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_kill_nonexistent_process() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_kill_nonexistent_process() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
     // Set delay to 0 for tests
     provider.set_delay(0)?;
 
