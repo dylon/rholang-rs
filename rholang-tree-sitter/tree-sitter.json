@@ -1,0 +1,39 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "rholang",
+      "camelcase": "Rholang",
+      "title": "Rholang",
+      "scope": "source.rholang",
+      "file-types": [
+        "rho"
+      ],
+      "injection-regex": "^rholang$",
+      "class-name": "TreeSitterRholang"
+    }
+  ],
+  "metadata": {
+    "version": "1.1.0",
+    "license": "MIT",
+    "description": "Parser for Rholang (Mercury)",
+    "authors": [
+      {
+        "name": "Marcin Rzeźnicki",
+        "email": "marcin.rzeznicki@gmail.com"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/tree-sitter/tree-sitter-rholang"
+    }
+  },
+  "bindings": {
+    "c": false,
+    "go": false,
+    "node": false,
+    "python": false,
+    "rust": true,
+    "swift": false,
+    "zig": false
+  }
+}

@@ -1,0 +1,137 @@
+==========
+Iteration
+==========
+
+new iterate in {
+    contract iterate(@list, process, done) = {
+      match list {
+        [hd ...tl] => {
+          new ack in {
+            process!(hd, *ack) |
+            for (_ <- ack) { iterate!(tl, *process, *done) }
+          }
+        }
+        _ => done!(Nil)
+      }
+    } |
+    new process, done in {
+      iterate!([4,5,6], *process, *done) |
+      contract process(@item, ack) = {
+        /* handle processing of item */
+        ack!(Nil)
+      } |
+      for (_ <- done) {
+         /* done! */
+        Nil
+      }
+    }
+  }
+
+---
+
+(source_file
+  (new
+    decls: (name_decls
+      (name_decl
+        (var)))
+    proc: (block
+      (par
+        (contract
+          name: (var)
+          formals: (names
+            (quote
+              (var))
+            (var)
+            (var))
+          proc: (block
+            (match
+              expression: (var)
+              cases: (cases
+                (case
+                  pattern: (collection
+                    (list
+                      (var)
+                      remainder: (var)))
+                  proc: (block
+                    (new
+                      decls: (name_decls
+                        (name_decl
+                          (var)))
+                      proc: (block
+                        (par
+                          (send
+                            channel: (var)
+                            send_type: (send_single)
+                            inputs: (inputs
+                              (var)
+                              (eval
+                                (var))))
+                          (input
+                            receipts: (receipts
+                              (receipt
+                                (linear_bind
+                                  names: (names
+                                    (wildcard))
+                                  input: (simple_source
+                                    (var)))))
+                            proc: (block
+                              (send
+                                channel: (var)
+                                send_type: (send_single)
+                                inputs: (inputs
+                                  (var)
+                                  (eval
+                                    (var))
+                                  (eval
+                                    (var)))))))))))
+                (case
+                  pattern: (wildcard)
+                  proc: (send
+                    channel: (var)
+                    send_type: (send_single)
+                    inputs: (inputs
+                      (nil))))))))
+        (new
+          decls: (name_decls
+            (name_decl
+              (var))
+            (name_decl
+              (var)))
+          proc: (block
+            (par
+              (par
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (collection
+                      (list
+                        (long_literal)
+                        (long_literal)
+                        (long_literal)))
+                    (eval
+                      (var))
+                    (eval
+                      (var))))
+                (contract
+                  name: (var)
+                  formals: (names
+                    (quote
+                      (var))
+                    (var))
+                  proc: (block
+                    (send
+                      channel: (var)
+                      send_type: (send_single)
+                      inputs: (inputs
+                        (nil))))))
+              (input
+                receipts: (receipts
+                  (receipt
+                    (linear_bind
+                      names: (names
+                        (wildcard))
+                      input: (simple_source
+                        (var)))))
+                proc: (block
+                  (nil))))))))))

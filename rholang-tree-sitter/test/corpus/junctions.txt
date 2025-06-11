@@ -1,0 +1,22 @@
+=======
+Junctions
+=======
+
+{ 1 /\ (1,"2")}
+{ 1 \/ Nil}
+
+
+---
+
+(source_file
+  (block
+    (conjunction
+      (long_literal)
+      (collection
+        (tuple
+          (long_literal)
+          (string_literal)))))
+  (block
+    (disjunction
+      (long_literal)
+      (nil))))

@@ -1,0 +1,120 @@
+===================
+Dining philosophers
+===================
+
+new philosopher1, philosopher2, north, south, knife, spoon in {
+    north!(*knife) |
+    south!(*spoon) |
+    for (@knf <- north; @spn <- south) {
+      philosopher1!("Complete!") |
+      north!(knf) |
+      south!(spn)
+    } |
+    for (@spn <- south; @knf <- north) {
+      philosopher2!("Complete!") |
+      north!(knf) |
+      south!(spn)
+    }
+}
+
+---
+
+(source_file
+  (new
+    decls: (name_decls
+      (name_decl
+        (var))
+      (name_decl
+        (var))
+      (name_decl
+        (var))
+      (name_decl
+        (var))
+      (name_decl
+        (var))
+      (name_decl
+        (var)))
+    proc: (block
+      (par
+        (par
+          (par
+            (send
+              channel: (var)
+              send_type: (send_single)
+              inputs: (inputs
+                (eval
+                  (var))))
+            (send
+              channel: (var)
+              send_type: (send_single)
+              inputs: (inputs
+                (eval
+                  (var)))))
+          (input
+            receipts: (receipts
+              (receipt
+                (linear_bind
+                  names: (names
+                    (quote
+                      (var)))
+                  input: (simple_source
+                    (var))))
+              (receipt
+                (linear_bind
+                  names: (names
+                    (quote
+                      (var)))
+                  input: (simple_source
+                    (var)))))
+            proc: (block
+              (par
+                (par
+                  (send
+                    channel: (var)
+                    send_type: (send_single)
+                    inputs: (inputs
+                      (string_literal)))
+                  (send
+                    channel: (var)
+                    send_type: (send_single)
+                    inputs: (inputs
+                      (var))))
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (var)))))))
+        (input
+          receipts: (receipts
+            (receipt
+              (linear_bind
+                names: (names
+                  (quote
+                    (var)))
+                input: (simple_source
+                  (var))))
+            (receipt
+              (linear_bind
+                names: (names
+                  (quote
+                    (var)))
+                input: (simple_source
+                  (var)))))
+          proc: (block
+            (par
+              (par
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (string_literal)))
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (var))))
+              (send
+                channel: (var)
+                send_type: (send_single)
+                inputs: (inputs
+                  (var))))))))))

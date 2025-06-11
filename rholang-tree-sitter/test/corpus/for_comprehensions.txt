@@ -1,0 +1,80 @@
+==================
+For comprehensions
+==================
+
+for (x <- a; y <-b) { P }
+for (x, y, z <= chan) { Q }
+for (x <- a & y <- b & z <- c) { R }
+for (x <- a; y <- b & z <- c) { R }
+
+---
+
+(source_file
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var))))
+      (receipt
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (repeated_bind
+          names: (names
+            (var)
+            (var)
+            (var))
+          input: (var))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var))))
+      (receipt
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))
+        (linear_bind
+          names: (names
+            (var))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var))))

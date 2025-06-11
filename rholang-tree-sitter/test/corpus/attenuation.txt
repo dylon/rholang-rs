@@ -1,0 +1,65 @@
+===========
+Attenuation
+===========
+
+new MakeGetForwarder in {
+  contract MakeGetForwarder(target, ret) = {
+    new port in {
+      ret!(*port) |
+      contract port(@method, @arg, ack) = {
+        match method == "get" { true => target!("get", arg, *ack) }
+      }
+    }
+  }
+}
+
+---
+
+(source_file
+  (new
+    decls: (name_decls
+      (name_decl
+        (var)))
+    proc: (block
+      (contract
+        name: (var)
+        formals: (names
+          (var)
+          (var))
+        proc: (block
+          (new
+            decls: (name_decls
+              (name_decl
+                (var)))
+            proc: (block
+              (par
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (eval
+                      (var))))
+                (contract
+                  name: (var)
+                  formals: (names
+                    (quote
+                      (var))
+                    (quote
+                      (var))
+                    (var))
+                  proc: (block
+                    (match
+                      expression: (eq
+                        (var)
+                        (string_literal))
+                      cases: (cases
+                        (case
+                          pattern: (bool_literal)
+                          proc: (send
+                            channel: (var)
+                            send_type: (send_single)
+                            inputs: (inputs
+                              (string_literal)
+                              (var)
+                              (eval
+                                (var)))))))))))))))))
