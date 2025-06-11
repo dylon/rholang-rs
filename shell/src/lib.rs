@@ -3,8 +3,7 @@ pub mod providers;
 use anyhow::Result;
 use bracket_parser::{BracketParser, BracketState};
 use clap::Parser;
-use providers::InterpreterProvider;
-use rholang_fake::InterpretationResult;
+use providers::{InterpretationResult, InterpreterProvider};
 use rustyline_async::{Readline, ReadlineEvent};
 use std::io::Write;
 

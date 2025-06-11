@@ -1,6 +1,7 @@
 use anyhow::{anyhow, Result};
-use rholang_fake::InterpretationResult;
-use shell::providers::{InterpreterProvider, RholangFakeInterpreterProvider};
+use shell::providers::{
+    InterpretationResult, InterpreterProvider, RholangParserInterpreterProvider,
+};
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -31,8 +32,8 @@ fn read_file(path: &Path) -> Result<String> {
     fs::read_to_string(path).map_err(|e| anyhow!("Failed to read file {}: {}", path.display(), e))
 }
 
-/// Process a Rholang file using the RholangFakeInterpreterProvider
-async fn process_file(interpreter: &RholangFakeInterpreterProvider, path: &Path) -> Result<()> {
+/// Process a Rholang file using the RholangParserInterpreterProvider
+async fn process_file(interpreter: &RholangParserInterpreterProvider, path: &Path) -> Result<()> {
     println!("Processing file: {}", path.display());
 
     // Read the file content
@@ -58,10 +59,10 @@ async fn process_file(interpreter: &RholangFakeInterpreterProvider, path: &Path)
 #[tokio::main]
 async fn main() -> Result<()> {
     // Create the interpreter
-    let interpreter = RholangFakeInterpreterProvider::new()?;
+    let interpreter = RholangParserInterpreterProvider::new()?;
 
-    // Find all Rholang files in the examples directory
-    let examples_dir = Path::new("rholang-fake/examples");
+    // Find all Rholang files in the corpus directory
+    let examples_dir = Path::new("rholang-parser/corpus");
     let rholang_files = find_rholang_files(examples_dir)?;
 
     println!("Found {} Rholang files", rholang_files.len());

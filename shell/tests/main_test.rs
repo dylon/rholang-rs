@@ -10,7 +10,7 @@ fn test_args_creation() {
 
 // Since main() is difficult to test directly, we'll test the components it uses
 // The run_shell function is already tested in lib_test.rs
-// The RholangFakeInterpreterProvider is already tested in providers_test.rs
+// The RholangParserInterpreterProvider is already tested in providers_test.rs
 // So we just need to test Args::parse, which we can do with a simple test
 
 #[test]

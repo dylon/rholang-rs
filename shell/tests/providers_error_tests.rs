@@ -1,13 +1,14 @@
 use anyhow::Result;
-use rholang_fake::InterpretationResult;
-use shell::providers::{InterpreterProvider, RholangFakeInterpreterProvider};
+use shell::providers::{
+    InterpretationResult, InterpreterProvider, RholangParserInterpreterProvider,
+};
 use std::time::Duration;
 use tokio::time::sleep;
 
-// Test for timeout handling in RholangFakeInterpreterProvider.interpret
+// Test for timeout handling in RholangParserInterpreterProvider.interpret
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_timeout() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_timeout() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
 
     // Set a very long delay to trigger timeout
     provider.set_delay(35000)?; // 35 seconds, which is longer than the 30-second timeout
@@ -22,7 +23,7 @@ async fn test_rholang_fake_interpreter_provider_timeout() -> Result<()> {
     match result {
         InterpretationResult::Error(err) => {
             assert!(
-                err.to_string().contains("Timeout"),
+                err.to_string().contains("timed out"),
                 "Expected timeout error, got: {}",
                 err
             );
@@ -35,10 +36,10 @@ async fn test_rholang_fake_interpreter_provider_timeout() -> Result<()> {
     Ok(())
 }
 
-// Test for cancellation handling in RholangFakeInterpreterProvider.interpret
+// Test for cancellation handling in RholangParserInterpreterProvider.interpret
 #[tokio::test]
-async fn test_rholang_fake_interpreter_provider_cancellation() -> Result<()> {
-    let provider = RholangFakeInterpreterProvider::new()?;
+async fn test_rholang_parser_interpreter_provider_cancellation() -> Result<()> {
+    let provider = RholangParserInterpreterProvider::new()?;
 
     // Set a delay long enough for us to cancel the process
     provider.set_delay(5000)?; // 5 seconds
