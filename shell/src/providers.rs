@@ -300,7 +300,7 @@ impl InterpreterProvider for RholangParserInterpreterProvider {
                 }
 
                 // Parse the code and return the result
-                match parser.get_tree_string(&code_for_task) {
+                match parser.get_pretty_tree(&code_for_task) {
                     ParseResult::Success(tree_string) => InterpretationResult::Success(tree_string),
                     ParseResult::Error(err) => {
                         let position = err.position.map(|pos| format!("{}", pos));
@@ -319,10 +319,7 @@ impl InterpreterProvider for RholangParserInterpreterProvider {
             // Wait for either the parser to finish, the timeout to expire, or the cancel signal to be received
             tokio::select! {
                 result = timeout_future => {
-                    match result {
-                        Ok(result) => result,
-                        Err(_) => InterpretationResult::Error(InterpreterError::timeout_error("Parser timed out after 30 seconds")),
-                    }
+                    result.unwrap_or_else(|_| InterpretationResult::Error(InterpreterError::timeout_error("Parser timed out after 30 seconds")))
                 }
                 _ = cancel_future => {
                     InterpretationResult::Error(InterpreterError::cancellation_error("Parser was cancelled"))
@@ -331,13 +328,10 @@ impl InterpreterProvider for RholangParserInterpreterProvider {
         });
 
         // Wait for the task to complete
-        let result = match handle.await {
-            Ok(result) => result,
-            Err(e) => InterpretationResult::Error(InterpreterError::other_error(format!(
-                "Task error: {}",
-                e
-            ))),
-        };
+        let result = handle.await.unwrap_or_else(|e| InterpretationResult::Error(InterpreterError::other_error(format!(
+            "Task error: {}",
+            e
+        ))));
 
         // Remove the process from the map
         let mut processes = match self.processes.lock() {
