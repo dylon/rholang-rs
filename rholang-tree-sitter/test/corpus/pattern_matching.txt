@@ -1,0 +1,208 @@
+=================
+Pattern matching
+=================
+
+new x in P
+for (w, x <- y) { P }
+for (@{x!(Q)} <- y) { P }
+for (@{for(z <- x) { Q }} <- y) { P }
+contract foo(x) = { P }
+match R { x!(Q) => P }
+match R { contract x(y) = { Q } => P }
+
+contract foo(@P) = { Q }
+for (@{x!(P)} <- y) { Q }
+for (@{for (@P <- z) { R }} <- y) { Q }
+for (@{ P | R } <- y) { Q }
+match R { P => Q }
+match R { [P, S ...T] => Q }
+match R { contract foo(x) = { P } => Q }
+match R { contract foo(@S) = { x!(P + S) } => Q }
+
+---
+
+(source_file
+  (new
+    decls: (name_decls
+      (name_decl
+        (var)))
+    proc: (var))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (var)
+            (var))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (quote
+              (block
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (var))))))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (quote
+              (block
+                (input
+                  receipts: (receipts
+                    (receipt
+                      (linear_bind
+                        names: (names
+                          (var))
+                        input: (simple_source
+                          (var)))))
+                  proc: (block
+                    (var))))))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (contract
+    name: (var)
+    formals: (names
+      (var))
+    proc: (block
+      (var)))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (send
+          channel: (var)
+          send_type: (send_single)
+          inputs: (inputs
+            (var)))
+        proc: (var))))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (contract
+          name: (var)
+          formals: (names
+            (var))
+          proc: (block
+            (var)))
+        proc: (var))))
+  (contract
+    name: (var)
+    formals: (names
+      (quote
+        (var)))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (quote
+              (block
+                (send
+                  channel: (var)
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (var))))))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (quote
+              (block
+                (input
+                  receipts: (receipts
+                    (receipt
+                      (linear_bind
+                        names: (names
+                          (quote
+                            (var)))
+                        input: (simple_source
+                          (var)))))
+                  proc: (block
+                    (var))))))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (input
+    receipts: (receipts
+      (receipt
+        (linear_bind
+          names: (names
+            (quote
+              (block
+                (par
+                  (var)
+                  (var)))))
+          input: (simple_source
+            (var)))))
+    proc: (block
+      (var)))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (var)
+        proc: (var))))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (collection
+          (list
+            (var)
+            (var)
+            remainder: (var)))
+        proc: (var))))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (contract
+          name: (var)
+          formals: (names
+            (var))
+          proc: (block
+            (var)))
+        proc: (var))))
+  (match
+    expression: (var)
+    cases: (cases
+      (case
+        pattern: (contract
+          name: (var)
+          formals: (names
+            (quote
+              (var)))
+          proc: (block
+            (send
+              channel: (var)
+              send_type: (send_single)
+              inputs: (inputs
+                (add
+                  (var)
+                  (var))))))
+        proc: (var)))))

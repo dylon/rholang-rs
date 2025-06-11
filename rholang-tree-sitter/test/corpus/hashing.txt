@@ -1,0 +1,79 @@
+========
+Hashing
+========
+
+new x, y, stdout(`rho:io:stdout`) in {
+    x!(@"name"!("Joe") | @"age"!(40)) | // (1)
+    for (@r <- x) { @"keccak256Hash"!(r.toByteArray(), *y) } |
+    // hash the program from (1)
+    for (@h <- y) { stdout!(h) } // print out the keccak256 hash
+}
+
+---
+
+(source_file
+  (new
+    decls: (name_decls
+      (name_decl
+        (var))
+      (name_decl
+        (var))
+      (name_decl
+        (var)
+        uri: (uri_literal)))
+    proc: (block
+      (par
+        (par
+          (send
+            channel: (var)
+            send_type: (send_single)
+            inputs: (inputs
+              (par
+                (send
+                  channel: (quote
+                    (string_literal))
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (string_literal)))
+                (send
+                  channel: (quote
+                    (string_literal))
+                  send_type: (send_single)
+                  inputs: (inputs
+                    (long_literal))))))
+          (input
+            receipts: (receipts
+              (receipt
+                (linear_bind
+                  names: (names
+                    (quote
+                      (var)))
+                  input: (simple_source
+                    (var)))))
+            proc: (block
+              (send
+                channel: (quote
+                  (string_literal))
+                send_type: (send_single)
+                inputs: (inputs
+                  (method
+                    receiver: (var)
+                    name: (var)
+                    args: (args))
+                  (eval
+                    (var)))))))
+        (input
+          receipts: (receipts
+            (receipt
+              (linear_bind
+                names: (names
+                  (quote
+                    (var)))
+                input: (simple_source
+                  (var)))))
+          proc: (block
+            (send
+              channel: (var)
+              send_type: (send_single)
+              inputs: (inputs
+                (var)))))))))
