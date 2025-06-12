@@ -328,10 +328,9 @@ impl InterpreterProvider for RholangParserInterpreterProvider {
         });
 
         // Wait for the task to complete
-        let result = handle.await.unwrap_or_else(|e| InterpretationResult::Error(InterpreterError::other_error(format!(
-            "Task error: {}",
-            e
-        ))));
+        let result = handle.await.unwrap_or_else(|e| {
+            InterpretationResult::Error(InterpreterError::other_error(format!("Task error: {}", e)))
+        });
 
         // Remove the process from the map
         let mut processes = match self.processes.lock() {
