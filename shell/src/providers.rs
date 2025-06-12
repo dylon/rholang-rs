@@ -199,18 +199,18 @@ impl RholangParserInterpreterProvider {
         Ok(RholangParserInterpreterProvider {
             processes: Arc::new(Mutex::new(HashMap::new())),
             next_pid: Arc::new(Mutex::new(1)),
-            delay_ms: Arc::new(Mutex::new(2000)), // Default delay: 2 seconds
+            delay_ms: Arc::new(Mutex::new(0)), // Default delay: 0 seconds
         })
     }
 
     /// Set the delay for async interpretation
-    pub fn set_delay(&self, delay_ms: u64) -> Result<()> {
+    pub fn set_delay(&self, delay_ms: u64) -> Result<&Self> {
         let mut delay = self
             .delay_ms
             .lock()
             .map_err(|e| anyhow!("Failed to lock delay_ms: {}", e))?;
         *delay = delay_ms;
-        Ok(())
+        Ok(self)
     }
 }
 
