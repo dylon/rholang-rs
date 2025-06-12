@@ -6,6 +6,5 @@ use shell::{providers::RholangParserInterpreterProvider, run_shell, Args};
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let interpreter = RholangParserInterpreterProvider::new()?;
-
     run_shell(args, interpreter).await
 }
