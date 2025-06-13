@@ -218,10 +218,7 @@ module.exports = grammar({
 
         // for comprehensions
         receipts: $ => semiSep1($.receipt),
-        receipt: $ => choice(
-            conc1($.linear_bind),
-            conc1($.repeated_bind),
-            conc1($.peek_bind)),
+        receipt: $ => conc1(choice($.linear_bind, $.repeated_bind, $.peek_bind)),
 
         linear_bind: $ => seq(
             field('names', $.names),

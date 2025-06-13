@@ -1631,73 +1631,44 @@
       ]
     },
     "receipt": {
-      "type": "CHOICE",
+      "type": "SEQ",
       "members": [
         {
-          "type": "SEQ",
+          "type": "CHOICE",
           "members": [
             {
               "type": "SYMBOL",
               "name": "linear_bind"
             },
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "&"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "linear_bind"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
               "type": "SYMBOL",
               "name": "repeated_bind"
             },
             {
-              "type": "REPEAT",
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "&"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "repeated_bind"
-                  }
-                ]
-              }
+              "type": "SYMBOL",
+              "name": "peek_bind"
             }
           ]
         },
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "peek_bind"
-            },
-            {
-              "type": "REPEAT",
-              "content": {
-                "type": "SEQ",
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "&"
+              },
+              {
+                "type": "CHOICE",
                 "members": [
                   {
-                    "type": "STRING",
-                    "value": "&"
+                    "type": "SYMBOL",
+                    "name": "linear_bind"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "repeated_bind"
                   },
                   {
                     "type": "SYMBOL",
@@ -1705,8 +1676,8 @@
                   }
                 ]
               }
-            }
-          ]
+            ]
+          }
         }
       ]
     },
