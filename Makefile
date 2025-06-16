@@ -81,6 +81,11 @@ coverage-html:
 clean:
 	cargo clean
 
+# Build the JetBrains plugin
+.PHONY: build-plugin
+build-plugin:
+	cd rholang-jetbrains-plugin && ./gradlew buildPlugin
+
 # Install development dependencies
 .PHONY: setup
 setup:
@@ -109,5 +114,6 @@ help:
 	@echo "  coverage        Run source-only test coverage (excluding tests)"
 	@echo "  coverage-html   Generate source-only HTML coverage report (excluding tests)"
 	@echo "  clean           Clean the project"
+	@echo "  build-plugin    Build the JetBrains plugin"
 	@echo "  setup           Install development dependencies"
 	@echo "  help            Show this help message"
