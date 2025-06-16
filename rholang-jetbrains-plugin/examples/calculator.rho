@@ -1,0 +1,59 @@
+// A simple calculator contract in Rholang
+
+new calculator, stdout(`rho:io:stdout`) in {
+  // Calculator contract that supports basic arithmetic operations
+  contract calculator(@operation, @x, @y, return) = {
+    match operation {
+      "add" => { return!(x + y) }
+      "subtract" => { return!(x - y) }
+      "multiply" => { return!(x * y) }
+      "divide" => { 
+        if (y == 0) {
+          return!("Error: Division by zero")
+        } else {
+          return!(x / y)
+        }
+      }
+      _ => { return!("Error: Unknown operation") }
+    }
+  } |
+  
+  // Test the calculator
+  new result in {
+    // Addition
+    calculator!("add", 5, 3, *result) |
+    for (@value <- result) {
+      stdout!("5 + 3 = " ++ value.toString() ++ "\n")
+    } |
+    
+    // Subtraction
+    calculator!("subtract", 10, 4, *result) |
+    for (@value <- result) {
+      stdout!("10 - 4 = " ++ value.toString() ++ "\n")
+    } |
+    
+    // Multiplication
+    calculator!("multiply", 6, 7, *result) |
+    for (@value <- result) {
+      stdout!("6 * 7 = " ++ value.toString() ++ "\n")
+    } |
+    
+    // Division
+    calculator!("divide", 20, 5, *result) |
+    for (@value <- result) {
+      stdout!("20 / 5 = " ++ value.toString() ++ "\n")
+    } |
+    
+    // Division by zero
+    calculator!("divide", 10, 0, *result) |
+    for (@value <- result) {
+      stdout!(value ++ "\n")
+    } |
+    
+    // Unknown operation
+    calculator!("power", 2, 3, *result) |
+    for (@value <- result) {
+      stdout!(value ++ "\n")
+    }
+  }
+}

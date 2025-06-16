@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.intellij' version '1.13.3'
+    id 'checkstyle'
+    id 'pmd'
+    id 'jacoco'
+}
+
+group 'org.rholang'
+version '1.0-SNAPSHOT'
+
+// Set Java compatibility
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+// Configure Java toolchain
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    version = '2022.3.3'
+    plugins = []
+}
+
+patchPluginXml {
+    sinceBuild = "223"
+    untilBuild = "251.*"
+    changeNotes = """
+      Initial release of the Rholang plugin.<br>
+      <em>Features:</em>
+      <ul>
+        <li>Syntax highlighting for Rholang files</li>
+        <li>File type recognition for .rho files</li>
+      </ul>
+      """
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java']
+        }
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['src/test/java']
+        }
+        resources {
+            srcDirs = ['src/test/resources']
+        }
+    }
+}
+
+// Configure Checkstyle
+checkstyle {
+    toolVersion = '10.3.3'
+    configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+    maxWarnings = 0
+    ignoreFailures = true
+}
+
+// Configure PMD
+pmd {
+    toolVersion = '6.55.0'
+    ruleSetFiles = files("${rootDir}/config/pmd/ruleset.xml")
+    ignoreFailures = true
+}
+
+// Configure JaCoCo
+jacoco {
+    toolVersion = '0.8.8'
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// Make sure JaCoCo report is generated after tests run
+test.finalizedBy jacocoTestReport
