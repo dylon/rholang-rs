@@ -8,6 +8,9 @@ set -e
 # - cargo check: for compilation errors
 # - cargo audit: for security vulnerabilities (if installed)
 # - cargo-tarpaulin: for test coverage
+# - checkstyle: for Java code style checking
+# - pmd: for Java code analysis
+# - jacoco: for Java test coverage
 
 echo "Running code quality checks..."
 
@@ -70,6 +73,56 @@ if command -v cargo-tarpaulin &> /dev/null; then
 else
     echo "ℹ️ cargo-tarpaulin not found, skipping test coverage check"
     echo "   Install with: cargo install cargo-tarpaulin"
+fi
+
+# Check JetBrains plugin code quality
+if [ -d "rholang-jetbrains-plugin" ]; then
+    echo "Checking JetBrains plugin code quality..."
+
+    # Change to the plugin directory
+    cd rholang-jetbrains-plugin
+
+    # Run Checkstyle
+    echo "Running Checkstyle..."
+    if ./gradlew checkstyleMain checkstyleTest; then
+        echo "✅ Checkstyle passed"
+    else
+        echo "❌ Checkstyle failed"
+        echo "1" > "$FAILURES"
+    fi
+
+    # Run PMD
+    echo "Running PMD..."
+    if ./gradlew pmdMain pmdTest; then
+        echo "✅ PMD passed"
+    else
+        echo "❌ PMD failed"
+        echo "1" > "$FAILURES"
+    fi
+
+    # Run tests with JaCoCo coverage
+    echo "Running tests with JaCoCo coverage..."
+    if ./gradlew test jacocoTestReport; then
+        echo "✅ Tests passed"
+        echo "JaCoCo coverage report is available at: rholang-jetbrains-plugin/build/reports/jacoco/test/html/index.html"
+    else
+        echo "❌ Tests failed"
+        echo "1" > "$FAILURES"
+    fi
+
+    # Build the plugin
+    echo "Building the plugin..."
+    if ./gradlew buildPlugin; then
+        echo "✅ Plugin build successful"
+    else
+        echo "❌ Plugin build failed"
+        echo "1" > "$FAILURES"
+    fi
+
+    # Change back to the project root
+    cd ..
+else
+    echo "ℹ️ JetBrains plugin directory not found, skipping plugin checks"
 fi
 
 # Check if any failures occurred

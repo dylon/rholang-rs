@@ -4,6 +4,7 @@ plugins {
     id 'checkstyle'
     id 'pmd'
     id 'jacoco'
+    id 'base'
 }
 
 group 'org.rholang'
@@ -102,3 +103,18 @@ jacocoTestReport {
 
 // Make sure JaCoCo report is generated after tests run
 test.finalizedBy jacocoTestReport
+
+// Task to build the rholang-parser-cli binary
+task buildRholangParserCli(type: Exec) {
+    workingDir rootProject.projectDir
+    commandLine 'cargo', 'build', '--release', '-p', 'rholang-parser-cli'
+}
+
+// Task to copy the rholang-parser-cli binary to the plugin distribution
+task copyRholangParserCli(type: Copy, dependsOn: buildRholangParserCli) {
+    from "${rootProject.projectDir}/target/release/rholang-parser-cli"
+    into "${project.buildDir}/resources/main"
+}
+
+// Make the plugin build depend on the copyRholangParserCli task
+processResources.dependsOn copyRholangParserCli

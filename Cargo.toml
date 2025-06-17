@@ -3,7 +3,8 @@ resolver = "3"
 members = [
     "shell",
     "rholang-tree-sitter",
-    "rholang-parser"
+    "rholang-parser",
+    "rholang-parser-cli"
 ]
 
 [workspace.dependencies]
