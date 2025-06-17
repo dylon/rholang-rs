@@ -18,7 +18,10 @@ impl MockArgs {
 }
 
 // Mock the run_shell function to avoid actually running the shell
-fn mock_run_shell<I>(args: MockArgs, _interpreter: I) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+fn mock_run_shell<I>(
+    args: MockArgs,
+    _interpreter: I,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     // Just record that the function was called with the given arguments
     MOCK_RUN_SHELL_CALLED.with(|called| {
         let mut called = called.lock().unwrap();
@@ -75,7 +78,10 @@ async fn test_main_calls_run_shell() -> Result<()> {
     // Verify that run_shell was called with the correct arguments
     MOCK_RUN_SHELL_ARGS.with(|args_store| {
         let args_store = args_store.lock().unwrap();
-        assert!(*args_store, "run_shell should have been called with multiline=true");
+        assert!(
+            *args_store,
+            "run_shell should have been called with multiline=true"
+        );
     });
 
     Ok(())
@@ -113,7 +119,10 @@ async fn test_main_with_multiline_false() -> Result<()> {
     // Verify that run_shell was called with the correct arguments
     MOCK_RUN_SHELL_ARGS.with(|args_store| {
         let args_store = args_store.lock().unwrap();
-        assert!(!*args_store, "run_shell should have been called with multiline=false");
+        assert!(
+            !*args_store,
+            "run_shell should have been called with multiline=false"
+        );
     });
 
     Ok(())

@@ -48,7 +48,7 @@ fn main() -> Result<()> {
         Commands::Parse { input, pretty } => {
             let code = read_input(input)?;
             let mut parser = RholangParser::new().context("Failed to create parser")?;
-            
+
             let result = match parser.get_tree_string(&code) {
                 rholang_parser::errors::ParseResult::Success(tree) => ParseResult {
                     valid: true,
@@ -71,7 +71,7 @@ fn main() -> Result<()> {
         Commands::Check { input } => {
             let code = read_input(input)?;
             let mut parser = RholangParser::new().context("Failed to create parser")?;
-            
+
             let valid = parser.is_valid(&code);
             let result = ParseResult {
                 valid,

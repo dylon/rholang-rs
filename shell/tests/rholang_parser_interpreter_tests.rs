@@ -1,9 +1,8 @@
 use anyhow::Result;
-use rstest::rstest;
 use std::time::Duration;
 use tokio::time::sleep;
 
-use shell::providers::{InterpretationResult, InterpreterProvider, RholangParserInterpreterProvider};
+use shell::providers::{InterpreterProvider, RholangParserInterpreterProvider};
 
 #[tokio::test]
 async fn test_rholang_parser_interpreter_creation() -> Result<()> {
@@ -63,7 +62,10 @@ async fn test_rholang_parser_interpreter_process_management() -> Result<()> {
 
     // List processes
     let processes = interpreter.list_processes()?;
-    assert!(!processes.is_empty(), "Expected at least one running process");
+    assert!(
+        !processes.is_empty(),
+        "Expected at least one running process"
+    );
 
     // Get the process ID
     let pid = processes[0].0;
