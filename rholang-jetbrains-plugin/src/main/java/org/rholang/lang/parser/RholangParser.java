@@ -18,8 +18,8 @@ public class RholangParser implements PsiParser {
         // Get the full text from the builder
         String text = builder.getOriginalText().toString();
 
-        // Check if the code is valid using the Rust parser
-        boolean isValid = RholangParserCli.isValid(text);
+        // Check if the code is valid using the Rust parser via JNI
+        boolean isValid = RholangParserJNI.isValid(text);
         LOG.debug("Rholang code is valid: " + isValid);
 
         // For now, just consume all tokens

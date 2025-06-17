@@ -25,9 +25,11 @@ java {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
@@ -104,17 +106,27 @@ jacocoTestReport {
 // Make sure JaCoCo report is generated after tests run
 test.finalizedBy jacocoTestReport
 
-// Task to build the rholang-parser-cli binary
-task buildRholangParserCli(type: Exec) {
+// Task to build the rholang-parser library with j4rs support
+task buildRholangParser(type: Exec) {
     workingDir rootProject.projectDir
-    commandLine 'cargo', 'build', '--release', '-p', 'rholang-parser-cli'
+    commandLine 'cargo', 'build', '--release', '-p', 'rholang-parser'
 }
 
-// Task to copy the rholang-parser-cli binary to the plugin distribution
-task copyRholangParserCli(type: Copy, dependsOn: buildRholangParserCli) {
-    from "${rootProject.projectDir}/target/release/rholang-parser-cli"
-    into "${project.buildDir}/resources/main"
+// No need for createJ4rsJar task as we're using j4rs from Maven Central
+
+// Create lib directory if it doesn't exist
+task createLibDir {
+    doLast {
+        mkdir "${project.buildDir}/resources/main/lib"
+    }
 }
 
-// Make the plugin build depend on the copyRholangParserCli task
-processResources.dependsOn copyRholangParserCli
+// Task to copy the rholang-parser library to the plugin distribution
+task copyRholangParser(type: Copy, dependsOn: [createLibDir, buildRholangParser]) {
+    from "${rootProject.projectDir}/target/release"
+    include "librholang_parser.*"
+    into "${project.buildDir}/resources/main/lib"
+}
+
+// Make the plugin build depend on the copyRholangParser task
+processResources.dependsOn copyRholangParser
