@@ -8,7 +8,6 @@ use rholang_tree_sitter::LANGUAGE;
 use tree_sitter::{Node, Parser};
 
 pub mod errors;
-pub mod jni_bridge;
 use errors::{ParseResult, ParserError, SourcePosition};
 
 /// A parser for Rholang code

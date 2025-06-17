@@ -1,16 +1,16 @@
 [package]
-name = "rholang-parser"
+name = "rholang-jni-bridge"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "rholang_parser"
+name = "rholang_jni_bridge"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 anyhow = { workspace = true }
-tree-sitter = { workspace = true }
-rholang-tree-sitter = { path = "../rholang-tree-sitter" }
+jni = "0.21.1"
+rholang-parser = { path = "../rholang-parser" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 
