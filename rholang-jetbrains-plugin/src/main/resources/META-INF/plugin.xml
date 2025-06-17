@@ -1,0 +1,26 @@
+<idea-plugin>
+    <id>org.rholang.lang</id>
+    <name>Rholang</name>
+    <vendor>Rholang Community</vendor>
+    <description><![CDATA[
+        Support for the Rholang programming language.
+        <br>
+        Features:
+        <ul>
+            <li>Syntax highlighting</li>
+            <li>File type recognition (.rho files)</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Rholang" implementationClass="org.rholang.lang.RholangFileType" 
+                  fieldName="INSTANCE" language="Rholang" extensions="rho"/>
+        <lang.parserDefinition language="Rholang" 
+                               implementationClass="org.rholang.lang.parser.RholangParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="Rholang"
+                                       implementationClass="org.rholang.lang.highlighting.RholangSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="org.rholang.lang.highlighting.RholangColorSettingsPage"/>
+    </extensions>
+</idea-plugin>
