@@ -80,6 +80,8 @@ coverage-html:
 .PHONY: clean
 clean:
 	cargo clean
+	cd rholang-jetbrains-plugin && ./gradlew clean
+	rm -rf rholang-jetbrains-plugin/.gradle
 
 # Build the JetBrains plugin
 .PHONY: build-plugin
@@ -119,7 +121,7 @@ help:
 	@echo "  fix             Fix code quality issues"
 	@echo "  coverage        Run source-only test coverage (excluding tests)"
 	@echo "  coverage-html   Generate source-only HTML coverage report (excluding tests)"
-	@echo "  clean           Clean the project"
+	@echo "  clean           Clean the project (including rholang-jetbrains-plugin)"
 	@echo "  build-plugin    Build the JetBrains plugin (includes building rholang-parser)"
 	@echo "  build-rholang-parser Build the rholang-parser library with j4rs support (required for the JetBrains plugin)"
 	@echo "  setup           Install development dependencies"
