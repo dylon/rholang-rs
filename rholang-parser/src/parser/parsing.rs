@@ -153,7 +153,7 @@ pub(super) fn node_to_ast<'ast>(
                     let name_node = get_field(&node, field!("name"));
                     let args_node = get_field(&node, field!("args"));
 
-                    let arity = args_node.named_child_count();
+                    let arity = effective_named_child_count(&args_node);
                     cont_stack.push(K::ConsumeMethod {
                         id: Id {
                             name: get_node_value(&name_node, source),
@@ -243,7 +243,7 @@ pub(super) fn node_to_ast<'ast>(
                     let has_remainder = remainder_node.is_some();
                     match collection_type {
                         kind!("list") => {
-                            let arity = collection_node.named_child_count();
+                            let arity = effective_named_child_count(&collection_node);
                             if arity == 0 {
                                 proc_stack.push(ast_builder.const_empty_list(), span);
                             } else {
@@ -257,7 +257,7 @@ pub(super) fn node_to_ast<'ast>(
                         }
                         kind!("set") => {
                             cont_stack.push(K::ConsumeSet {
-                                arity: collection_node.named_child_count(),
+                                arity: effective_named_child_count(&collection_node),
                                 has_remainder,
                                 span,
                             });
@@ -265,14 +265,14 @@ pub(super) fn node_to_ast<'ast>(
                         }
                         kind!("tuple") => {
                             cont_stack.push(K::ConsumeTuple {
-                                arity: collection_node.named_child_count(),
+                                arity: effective_named_child_count(&collection_node),
                                 span,
                             });
                             cont_stack.push(K::EvalList(collection_node.walk()));
                         }
                         kind!("map") => {
                             let mut temp_cont_stack =
-                                Vec::with_capacity(collection_node.named_child_count() * 2);
+                                Vec::with_capacity(effective_named_child_count(&collection_node) * 2);
                             let arity = eval_named_pairs(
                                 &collection_node,
                                 kind!("key_value_pair"),
@@ -308,7 +308,7 @@ pub(super) fn node_to_ast<'ast>(
                         kind!("send_multiple") => SendType::Multiple,
                         _ => unreachable!("Send type can only be: single or multiple"),
                     };
-                    let arity = inputs_node.named_child_count();
+                    let arity = effective_named_child_count(&inputs_node);
                     cont_stack.push(K::ConsumeSend {
                         send_type,
                         arity,
@@ -362,7 +362,7 @@ pub(super) fn node_to_ast<'ast>(
 
                     if let Some(formals_node) = node.child_by_field_id(field!("formals")) {
                         cont_stack.push(K::ConsumeContract {
-                            arity: formals_node.named_child_count(),
+                            arity: effective_named_child_count(&formals_node),
                             has_cont: formals_node.child_by_field_name("cont").is_some(),
                             span,
                         });
@@ -400,17 +400,19 @@ pub(super) fn node_to_ast<'ast>(
                     let receipts_node = get_field(&node, field!("receipts"));
                     let proc_node = get_field(&node, field!("proc"));
 
-                    let mut rs = SmallVec::with_capacity(receipts_node.named_child_count());
+                    let mut rs = SmallVec::with_capacity(effective_named_child_count(&receipts_node));
                     let mut temp_cont_stack = Vec::with_capacity(rs.capacity() * 2);
 
                     let mut total_len = 0;
 
-                    for receipt_node in receipts_node.named_children(&mut receipts_node.walk()) {
-                        let mut bs = SmallVec::with_capacity(receipt_node.named_child_count());
+                    let mut receipts_cursor = receipts_node.walk();
+                    for receipt_node in receipts_node.named_children(&mut receipts_cursor).filter(|n| !is_comment(n)) {
+                        let mut bs = SmallVec::with_capacity(effective_named_child_count(&receipt_node));
                         let mut receipt_len = 0;
 
-                        for bind_node in receipt_node.named_children(&mut receipt_node.walk()) {
-                            let (names_node, source_node) = if bind_node.named_child_count() > 1 {
+                        let mut receipt_cursor = receipt_node.walk();
+                        for bind_node in receipt_node.named_children(&mut receipt_cursor).filter(|n| !is_comment(n)) {
+                            let (names_node, source_node) = if effective_named_child_count(&bind_node) > 1 {
                                 let (ns, s) = get_left_and_right(&bind_node);
                                 (Some(ns), s)
                             } else {
@@ -418,7 +420,7 @@ pub(super) fn node_to_ast<'ast>(
                             };
                             let (name_count, cont_present) = match names_node {
                                 Some(names) => (
-                                    names.named_child_count(),
+                                    effective_named_child_count(&names),
                                     names.child_by_field_id(field!("cont")).is_some(),
                                 ),
                                 None => (0, false),
@@ -433,7 +435,7 @@ pub(super) fn node_to_ast<'ast>(
                                             let inputs_node =
                                                 get_field(&source_node, field!("inputs"));
                                             SourceDesc::SR {
-                                                arity: inputs_node.named_child_count(),
+                                                arity: effective_named_child_count(&inputs_node),
                                             }
                                         }
                                         _ => unreachable!(
@@ -509,7 +511,7 @@ pub(super) fn node_to_ast<'ast>(
                     let cases_node = get_field(&node, field!("cases"));
 
                     let mut temp_cont_stack =
-                        Vec::with_capacity(2 * cases_node.named_child_count());
+                        Vec::with_capacity(2 * effective_named_child_count(&cases_node));
                     let arity = eval_named_pairs(
                         &cases_node,
                         kind!("case"),
@@ -539,15 +541,16 @@ pub(super) fn node_to_ast<'ast>(
 
                     let concurrent = decls_node.kind_id() == kind!("conc_decls");
 
-                    let mut let_decls = SmallVec::with_capacity(decls_node.named_child_count());
+                    let mut let_decls = SmallVec::with_capacity(effective_named_child_count(&decls_node));
                     let mut temp_cont_stack = Vec::with_capacity(2 * let_decls.capacity());
 
                     let mut total_len = 0;
 
-                    for decl_node in decls_node.named_children(&mut decls_node.walk()) {
+                    let mut decls_cursor = decls_node.walk();
+                    for decl_node in decls_node.named_children(&mut decls_cursor).filter(|n| !is_comment(n)) {
                         let (lhs, rhs) = get_left_and_right(&decl_node);
-                        let lhs_arity = lhs.named_child_count();
-                        let rhs_arity = rhs.named_child_count();
+                        let lhs_arity = effective_named_child_count(&lhs);
+                        let rhs_arity = effective_named_child_count(&rhs);
                         let lhs_has_cont = lhs.child_by_field_id(field!("cont")).is_some();
 
                         if let_decl_is_malformed(lhs_arity, rhs_arity, lhs_has_cont) {
@@ -602,7 +605,7 @@ pub(super) fn node_to_ast<'ast>(
                 kind!("send_sync") => {
                     let name_node = get_field(&node, field!("channel"));
                     let messages_node = get_field(&node, field!("inputs"));
-                    let arity = messages_node.named_child_count();
+                    let arity = effective_named_child_count(&messages_node);
                     let sync_send_cont_node = get_field(&node, field!("cont"));
                     let choice_node = get_first_child(&sync_send_cont_node);
                     match choice_node.kind_id() {
@@ -641,6 +644,10 @@ pub(super) fn node_to_ast<'ast>(
                     proc_stack.push(ast_builder.alloc_var_ref(var_ref_kind, var), span);
                 }
 
+                kind!("line_comment") | kind!("block_comment") => {
+                    continue 'parse;
+                }
+
                 _ => unimplemented!(),
             }
         }
@@ -675,9 +682,10 @@ pub(super) fn node_to_ast<'ast>(
 }
 
 fn parse_decls<'a>(from: &tree_sitter::Node, source: &'a str) -> Vec<NameDecl<'a>> {
-    let mut result = Vec::with_capacity(from.named_child_count());
+    let mut result = Vec::with_capacity(effective_named_child_count(from));
 
-    for decl_node in from.named_children(&mut from.walk()) {
+    let mut cursor = from.walk();
+    for decl_node in from.named_children(&mut cursor).filter(|n| !is_comment(n)) {
         let var_node = get_first_child(&decl_node);
         let id = Id {
             name: get_node_value(&var_node, source),
@@ -698,16 +706,20 @@ fn apply_cont<'tree, 'ast>(
     proc_stack: &mut ProcStack<'ast>,
     ast_builder: &'ast ASTBuilder<'ast>,
 ) -> Step<'tree> {
-    fn move_cursor_to_named(cursor: &mut tree_sitter::TreeCursor) -> bool {
+    fn move_cursor_to_named_non_comment(cursor: &mut tree_sitter::TreeCursor) -> bool {
         let mut has_more = if cursor.depth() == 0 {
             cursor.goto_first_child()
         } else {
             cursor.goto_next_sibling()
         };
-        while has_more && !cursor.node().is_named() {
+        while has_more {
+            let node = cursor.node();
+            if node.is_named() && !is_comment(&node) {
+                return true;
+            }
             has_more = cursor.goto_next_sibling();
         }
-        has_more
+        false
     }
 
     loop {
@@ -723,7 +735,7 @@ fn apply_cont<'tree, 'ast>(
                 return Step::Continue(next);
             }
             K::EvalList(cursor) => {
-                if move_cursor_to_named(cursor) {
+                if move_cursor_to_named_non_comment(cursor) {
                     return Step::Continue(cursor.node());
                 }
                 cont_stack.pop();
@@ -954,6 +966,18 @@ fn apply_cont<'tree, 'ast>(
             }
         }
     }
+}
+
+fn is_comment(node: &tree_sitter::Node) -> bool {
+    let id = node.kind_id();
+    id == kind!("line_comment") || id == kind!("block_comment")
+}
+
+fn effective_named_child_count(node: &tree_sitter::Node) -> usize {
+    let mut cursor = node.walk();
+    node.named_children(&mut cursor)
+        .filter(|child| !is_comment(child))
+        .count()
 }
 
 enum Step<'a> {
@@ -1346,7 +1370,7 @@ fn get_left_and_right<'a>(
         .and_then(|left| of.named_child(1).map(|right| (left, right)))
         .unwrap_or_else(|| {
             panic!(
-                "{:?} is expected to have two child nodes - left and right < {:?} >",
+                "{:?} is expected to have two two child nodes - left and right < {:?} >",
                 of.kind(),
                 of.to_sexp()
             )
