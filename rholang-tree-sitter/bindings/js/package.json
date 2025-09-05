@@ -1,6 +1,6 @@
 {
   "name": "@f1r3fly-io/tree-sitter-rholang-js-with-comments",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Parser for Rholang (Mercury)",
   "repository": {
     "type": "git",
