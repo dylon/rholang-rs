@@ -25,7 +25,8 @@
     "require": "./dist/tree-sitter-rholang-js.cjs.js"
   },
   "files": [
-    "dist"
+    "dist",
+    "tree-sitter-rholang.wasm"
   ],
   "keywords": [
     "incremental",
