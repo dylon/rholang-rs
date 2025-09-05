@@ -62,7 +62,7 @@ jobs:
       - name: Publish
         run: npm publish --no-git-checks --access public
         env:
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         working-directory: rholang-tree-sitter/bindings/js
 
       - name: Update package.json
