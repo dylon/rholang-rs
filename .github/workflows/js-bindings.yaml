@@ -5,7 +5,7 @@ concurrency:
 
 on:
   push:
-    branches: [dylon/comments]
+    branches: [master]
     paths:
       - "rholang-tree-sitter/**"
       - "!rholang-tree-sitter/bindings/*/**"
